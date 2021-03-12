@@ -98,12 +98,13 @@ export class DefinitionGenerator {
     for (const funcConfig of config) {
       // loop through http events
       for (const httpEvent of this.getHttpEvents(funcConfig.events)) {
-        const httpEventConfig = httpEvent.http;
+        const httpEventConfig = httpEvent.http || httpEvent.httpApi; // support httpApi event;
 
         if (httpEventConfig.documentation) {
           // Build OpenAPI path configuration structure for each method
+          const normalizedPath = httpEventConfig.path.replace(/^\/+/g, "");
           const pathConfig = {
-            [`/${httpEventConfig.path}`]: {
+            [`/${normalizedPath}`]: {
               [httpEventConfig.method.toLowerCase()]: this.getOperationFromConfig(
                 funcConfig._functionName,
                 httpEventConfig.documentation
@@ -271,9 +272,7 @@ export class DefinitionGenerator {
         if (requestModel) {
           const reqModelConfig = {
             schema: {
-              $ref: `#/components/schemas/${
-                documentationConfig.requestModels[requestModelType]
-              }`
+              $ref: `#/components/schemas/${documentationConfig.requestModels[requestModelType]}`
             }
           };
 
@@ -377,6 +376,8 @@ export class DefinitionGenerator {
   }
 
   private getHttpEvents(funcConfig) {
-    return funcConfig.filter(event => (event.http ? true : false));
+    return funcConfig.filter(event =>
+      event.http || event.httpApi ? true : false
+    );
   }
 }
