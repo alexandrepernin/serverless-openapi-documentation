@@ -29,7 +29,7 @@ interface Service {
 interface Variables {
   service: Service;
 }
-
+//@ts-ignore
 interface FullServerless extends Serverless {
   variables: Variables;
   processedInput: ProcessedInput;
@@ -47,9 +47,8 @@ export class ServerlessOpenApiDocumentation {
   /**
    * Constructor
    * @param serverless
-   * @param options
    */
-  public constructor(serverless: FullServerless, options) {
+  public constructor(serverless: FullServerless) {
     // pull the serverless instance into our class vars
     this.serverless = serverless;
     // Serverless service custom variables
@@ -113,6 +112,7 @@ export class ServerlessOpenApiDocumentation {
       });
 
     // Add Paths to OpenAPI Output from Function Configuration
+    //@ts-ignore
     generator.readFunctions(funcConfigs);
 
     // Process CLI Input options
